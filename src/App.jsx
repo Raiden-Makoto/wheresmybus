@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapContainer, TileLayer, Circle, CircleMarker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Circle, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
@@ -7,7 +7,7 @@ import "./App.css";
 // Config
 const DATA_URL = "https://api.npoint.io/96cc873ccf014e5cbd0c";
 const FALLBACK = { lat: 43.6532, lng: -79.3832 };
-const DEFAULT_RADIUS = 600;
+const DEFAULT_RADIUS = 2000;
 
 function FlyTo({ center }) {
   const map = useMap();
@@ -98,16 +98,12 @@ export default function App() {
       }
     }
     list.sort((a, b) => a.dist - b.dist);
+    console.log(`Found ${list.length} stops within ${radius}m radius`);
     return list;
   }, [stops, center, radius]);
 
   return (
     <div className="app-container">
-      {/* Theme toggle button */}
-      <button className="theme-toggle" onClick={toggleTheme}>
-        {theme === "light" ? "🌙" : "☀️"}
-      </button>
-
       {/* Modal */}
       {showModal && (
         <div className="modal-overlay">
@@ -130,7 +126,9 @@ export default function App() {
 
       {/* Menu bar */}
       <div className="menu-bar">
-        <span className="status-text">{status}</span>
+        <span className="status-text">
+          {status} {nearbyStops.length > 0 && `• ${nearbyStops.length} stops found`}
+        </span>
         <input
           type="text"
           placeholder="Search..."
@@ -144,6 +142,9 @@ export default function App() {
         <button className="menu-button">
           Button 2
         </button>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === "light" ? "🌙" : "☀️"}
+        </button>
       </div>
 
       {/* Map */}
@@ -151,20 +152,42 @@ export default function App() {
         <TileLayer attribution='&copy; OpenStreetMap contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <FlyTo center={center} />
-        <CircleMarker center={[center.lat, center.lng]} radius={8}>
+        <Marker 
+          position={[center.lat, center.lng]}
+          icon={L.divIcon({
+            className: 'custom-marker current-location',
+            html: '📍',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24]
+          })}
+        >
           <Popup>{pos ? "You are here" : "Default area"}</Popup>
-        </CircleMarker>
+        </Marker>
         <Circle center={[center.lat, center.lng]} radius={radius} />
         {nearbyStops.map((s) => (
-          <CircleMarker key={s.stopCode} center={[s.lat, s.lon]} radius={6}>
+          <Marker 
+            key={s.stopCode} 
+            position={[s.lat, s.lon]}
+            icon={L.divIcon({
+              className: 'custom-marker bus-stop',
+              html: '📍',
+              iconSize: [20, 20],
+              iconAnchor: [10, 20]
+            })}
+          >
             <Popup>
               <b>{s.stopCode}</b>
               <br />{s.name}
               <br /><small>{s.dist} m away</small>
             </Popup>
-          </CircleMarker>
+          </Marker>
         ))}
       </MapContainer>
+      
+      {/* Map attribution footer */}
+      <div className="map-attribution">
+        © OpenStreetMap contributors • Data provided by OpenStreetMap
+      </div>
     </div>
   );
 }
