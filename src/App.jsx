@@ -110,7 +110,7 @@ export default function App() {
           <div className="modal-content">
             <h3 className="modal-title">Enable location?</h3>
             <p className="modal-description">
-              This app can center the map on your current location and show TTC stops within a chosen radius.
+              This app can center the map on your current location and show TTC bus stops within a 2km radius.
             </p>
             <div className="modal-actions">
               <button onClick={handleNotNow} className="btn btn-secondary">
@@ -137,10 +137,10 @@ export default function App() {
           className="search-input"
         />
         <button className="menu-button">
-          Button 1
+          Search for a Stop
         </button>
         <button className="menu-button">
-          Button 2
+          Search by Route
         </button>
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "light" ? "🌙" : "☀️"}
