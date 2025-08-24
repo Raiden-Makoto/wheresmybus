@@ -1,0 +1,237 @@
+:root {
+  /* Light theme colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f7;
+  --bg-overlay: rgba(0, 0, 0, 0.35);
+  --bg-modal: #ffffff;
+  --bg-menu: rgba(255, 255, 255, 0.96);
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --border-primary: #ddd;
+  --border-secondary: #2563eb;
+  --button-primary: #2563eb;
+  --button-secondary: #f7f7f7;
+  --shadow-primary: rgba(0, 0, 0, 0.12);
+  --shadow-secondary: rgba(0, 0, 0, 0.16);
+  --shadow-menu: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+  /* Dark theme colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  --bg-modal: #2d2d2d;
+  --bg-menu: rgba(45, 45, 45, 0.96);
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --border-primary: #555;
+  --border-secondary: #3b82f6;
+  --button-primary: #3b82f6;
+  --button-secondary: #404040;
+  --shadow-primary: rgba(0, 0, 0, 0.3);
+  --shadow-secondary: rgba(0, 0, 0, 0.4);
+  --shadow-menu: rgba(0, 0, 0, 0.4);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  background: var(--bg-menu);
+  border: 1px solid var(--border-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 12px var(--shadow-menu);
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-secondary);
+}
+
+/* App container */
+.app-container {
+  height: 100dvh;
+  width: 100%;
+  position: relative;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.modal-content {
+  background: var(--bg-modal);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 10px 20px var(--shadow-primary), 0 6px 6px var(--shadow-secondary);
+  color: var(--text-primary);
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+
+.modal-description {
+  margin: 0 0 16px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  border-color: var(--border-primary);
+  background: var(--button-secondary);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-secondary);
+}
+
+.btn-primary {
+  border-color: var(--border-secondary);
+  background: var(--button-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+/* Menu bar styles */
+.menu-bar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  background: var(--bg-menu);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 12px var(--shadow-menu);
+  flex-wrap: wrap;
+  width: 100%;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.status-text {
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.search-input {
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+  min-width: 180px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--border-secondary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.menu-button {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-secondary);
+  background: var(--button-primary);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.menu-button:hover {
+  background: #1d4ed8;
+}
+
+/* Map container */
+.map-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .menu-bar {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  
+  .search-input {
+    min-width: 140px;
+  }
+  
+  .modal-content {
+    margin: 16px;
+    padding: 16px;
+  }
+}
+
+/* Dark mode for Leaflet map */
+[data-theme="dark"] .leaflet-container {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .leaflet-popup-content-wrapper {
+  background: var(--bg-modal);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .leaflet-popup-tip {
+  background: var(--bg-modal);
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
