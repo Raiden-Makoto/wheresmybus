@@ -61,7 +61,7 @@ export default function StopPage({ stops }) {
       </div>
 
       {/* Stop info */}
-      <div style={{ padding: "20px" }}>
+      <div style={{ padding: "20px 20px 00px 20px" }}>
         <h1>Stop {stopCode}: {stop.stop_name}</h1>
       </div>
 
@@ -104,8 +104,8 @@ export default function StopPage({ stops }) {
       </div>
 
       {/* Route Info */}
-      <div style={{ padding: "20px" }}>
-        <h2>Routes at this Stop</h2>
+      <div style={{ padding: "00px 20px 20px 20px" }}>
+        <h2>Upcoming Departures</h2>
       </div>
     </div>
   );
