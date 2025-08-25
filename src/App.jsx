@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import StopPage from "./StopPage.jsx";
+import RouteList from "./RouteList.jsx";
 import { useTheme } from "./ThemeContext.jsx";
 
 // Config
@@ -148,7 +149,7 @@ export default function App() {
               <button className="menu-button" onClick={handleSearchStop}>
                 Search for a Stop
               </button>
-              <button className="menu-button">
+              <button className="menu-button" onClick={() => navigate('/routes')}>
                 Search by Route
               </button>
               <button className="theme-toggle" onClick={toggleTheme}>
@@ -202,6 +203,9 @@ export default function App() {
 
       {/* Stop page */}
       <Route path="/stop/:stopCode" element={<StopPage stops={stops} />} />
+      
+      {/* Routes page */}
+      <Route path="/routes" element={<RouteList />} />
     </Routes>
   );
 }

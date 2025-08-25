@@ -49,7 +49,7 @@ export default function StopPage({ stops }) {
         <button className="menu-button">
           Search for a Stop
         </button>
-        <button className="menu-button">
+        <button className="menu-button" onClick={() => navigate('/routes')}>
           Search by Route
         </button>
         <button className="menu-button" onClick={handleBackToMap}>
