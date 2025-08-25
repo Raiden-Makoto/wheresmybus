@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import StopPage from "./StopPage.jsx";
+import { useTheme } from "./ThemeContext.jsx";
 
 // Config
 const DATA_URL = "https://api.npoint.io/96cc873ccf014e5cbd0c";
@@ -30,9 +31,9 @@ export default function App() {
   const [pos, setPos] = useState(null);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
   const [queryInput, setQueryInput] = useState("");
-  const [theme, setTheme] = useState("light");
 
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const handleSearchStop = () => {
     if (queryInput.trim()) {
@@ -55,14 +56,7 @@ export default function App() {
     })();
   }, []);
 
-  // Theme management
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === "light" ? "dark" : "light");
-  };
 
   // Modal actions
   const handleEnableLocation = () => {

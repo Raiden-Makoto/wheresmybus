@@ -1,25 +1,16 @@
 // StopPage.jsx
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
+import { useTheme } from "./ThemeContext.jsx";
 
 export default function StopPage({ stops }) {
   const { stopCode } = useParams(); // get code from /stop/:stopCode
   const navigate = useNavigate();
-  const [theme, setTheme] = useState("light");
+  const { theme, toggleTheme } = useTheme();
   const stop = stops?.[stopCode];   // look up in stops data
-
-  // Theme management
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === "light" ? "dark" : "light");
-  };
 
   const handleBackToMap = () => {
     navigate("/");
@@ -71,9 +62,7 @@ export default function StopPage({ stops }) {
 
       {/* Stop info */}
       <div style={{ padding: "20px" }}>
-        <h2>Stop {stopCode}</h2>
-        <p><strong>Name:</strong> {stop.stop_name}</p>
-        <p><strong>Location:</strong> {stopLat.toFixed(6)}, {stopLon.toFixed(6)}</p>
+        <h1>Stop {stopCode}: {stop.stop_name}</h1>
       </div>
 
       {/* Map showing stop location */}
@@ -112,7 +101,10 @@ export default function StopPage({ stops }) {
           </Marker>
         </MapContainer>
       </div>
-
+      {/* Route Info */}
+      <div style={{ padding: "20px" }}>
+        <h2>Routes at this Stop</h2>
+      </div>
       {/* Map attribution footer */}
       <div className="map-attribution">
         © OpenStreetMap contributors • Data provided by OpenStreetMap
