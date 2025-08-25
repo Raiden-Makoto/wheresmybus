@@ -71,7 +71,8 @@ export default function StopPage({ stops }) {
         margin: "0 20px 20px 20px",
         border: "2px solid var(--border-primary)",
         borderRadius: "8px",
-        overflow: "hidden"
+        overflow: "hidden",
+        position: "relative"
       }}>
         <MapContainer 
           center={[stopLat, stopLon]} 
@@ -101,13 +102,10 @@ export default function StopPage({ stops }) {
           </Marker>
         </MapContainer>
       </div>
+
       {/* Route Info */}
       <div style={{ padding: "20px" }}>
         <h2>Routes at this Stop</h2>
-      </div>
-      {/* Map attribution footer */}
-      <div className="map-attribution">
-        © OpenStreetMap contributors • Data provided by OpenStreetMap
       </div>
     </div>
   );

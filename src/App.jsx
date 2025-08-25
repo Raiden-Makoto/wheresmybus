@@ -196,11 +196,6 @@ export default function App() {
                 </Marker>
               ))}
             </MapContainer>
-            
-            {/* Map attribution footer */}
-            <div className="map-attribution">
-              © OpenStreetMap contributors • Data provided by OpenStreetMap
-            </div>
           </div>
         }
       />
