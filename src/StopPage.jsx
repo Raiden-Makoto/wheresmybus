@@ -1,32 +1,121 @@
 // StopPage.jsx
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "./App.css";
 
 export default function StopPage({ stops }) {
   const { stopCode } = useParams(); // get code from /stop/:stopCode
+  const navigate = useNavigate();
+  const [theme, setTheme] = useState("light");
   const stop = stops?.[stopCode];   // look up in stops data
+
+  // Theme management
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "light" ? "dark" : "light");
+  };
+
+  const handleBackToMap = () => {
+    navigate("/");
+  };
+
+  if (!stop) {
+    return (
+      <div className="app-container">
+        <div className="menu-bar">
+          <span className="status-text">Stop Not Found</span>
+          <button className="menu-button" onClick={handleBackToMap}>
+            Back to Map
+          </button>
+        </div>
+        <div style={{ padding: "20px", textAlign: "center" }}>
+          <h2>Stop {stopCode} not found</h2>
+          <p>This stop code doesn't exist in our database.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const stopLat = Number(stop.stop_lat);
+  const stopLon = Number(stop.stop_lon);
 
   return (
     <div className="app-container">
       {/* Menu bar */}
       <div className="menu-bar">
-        <span className="status-text">Viewing Stop</span>
-        <input type="text" placeholder="Search..." className="search-input" />
-        <button className="menu-button" disabled>Search for a Stop</button>
-        <button className="menu-button" disabled>Search by Route</button>
-        <button className="theme-toggle" disabled>🌙</button>
+        <span className="status-text">Viewing Stop {stopCode}</span>
+        <input
+          type="text"
+          placeholder="Search..."
+          className="search-input"
+        />
+        <button className="menu-button">
+          Search for a Stop
+        </button>
+        <button className="menu-button">
+          Search by Route
+        </button>
+        <button className="menu-button" onClick={handleBackToMap}>
+          Back to Map
+        </button>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === "light" ? "🌙" : "☀️"}
+        </button>
       </div>
 
       {/* Stop info */}
       <div style={{ padding: "20px" }}>
-        {stop ? (
-          <>
-            <h2>Stop {stopCode}</h2>
-            <p>{stop.stop_name}</p>
-          </>
-        ) : (
-          <p>No stop found for code {stopCode}</p>
-        )}
+        <h2>Stop {stopCode}</h2>
+        <p><strong>Name:</strong> {stop.stop_name}</p>
+        <p><strong>Location:</strong> {stopLat.toFixed(6)}, {stopLon.toFixed(6)}</p>
+      </div>
+
+      {/* Map showing stop location */}
+      <div style={{ 
+        height: "400px", 
+        margin: "0 20px 20px 20px",
+        border: "2px solid var(--border-primary)",
+        borderRadius: "8px",
+        overflow: "hidden"
+      }}>
+        <MapContainer 
+          center={[stopLat, stopLon]} 
+          zoom={16} 
+          style={{ height: "100%", width: "100%" }}
+          scrollWheelZoom={false}
+        >
+          <TileLayer 
+            attribution='&copy; OpenStreetMap contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
+          />
+          <Marker 
+            position={[stopLat, stopLon]}
+            icon={L.divIcon({
+              className: 'custom-marker bus-stop',
+              html: `<svg width="20" height="26" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 0C4.48 0 0 4.48 0 10c0 7.5 10 16 10 16s10-8.5 10-16c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" fill="#ef4444"/>
+              </svg>`,
+              iconSize: [20, 26],
+              iconAnchor: [10, 26]
+            })}
+          >
+            <Popup>
+              <b>Stop {stopCode}</b><br />
+              {stop.stop_name}
+            </Popup>
+          </Marker>
+        </MapContainer>
+      </div>
+
+      {/* Map attribution footer */}
+      <div className="map-attribution">
+        © OpenStreetMap contributors • Data provided by OpenStreetMap
       </div>
     </div>
   );
