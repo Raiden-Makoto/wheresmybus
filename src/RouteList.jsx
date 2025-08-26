@@ -146,6 +146,9 @@ export default function RouteList() {
                     e.target.style.background = "var(--bg-secondary)";
                     e.target.style.borderColor = "var(--border-primary)";
                   }}
+                  onClick={() => navigate(`/route/${routeNumber}`, { 
+                    state: { routeName: routeName } 
+                  })}
                 >
                   <strong>{routeName}</strong>
                 </button>
@@ -193,6 +196,9 @@ export default function RouteList() {
                     e.target.style.background = "var(--bg-secondary)";
                     e.target.style.borderColor = "var(--border-primary)";
                   }}
+                  onClick={() => navigate(`/route/${routeNumber}`, { 
+                    state: { routeName: routeName } 
+                  })}
                 >
                   <strong style={{ color: "#ec4899" }}>{routeName}</strong>
                 </button>
@@ -240,6 +246,9 @@ export default function RouteList() {
                     e.target.style.background = "var(--bg-secondary)";
                     e.target.style.borderColor = "var(--border-primary)";
                   }}
+                  onClick={() => navigate(`/route/${routeNumber}`, { 
+                    state: { routeName: routeName } 
+                  })}
                 >
                   <strong style={{ color: "#3b82f6" }}>{routeName}</strong>
                 </button>
@@ -287,6 +296,9 @@ export default function RouteList() {
                     e.target.style.background = "var(--bg-secondary)";
                     e.target.style.borderColor = "var(--border-primary)";
                   }}
+                  onClick={() => navigate(`/route/${routeNumber}`, { 
+                    state: { routeName: routeName } 
+                  })}
                 >
                   <strong style={{ color: "#10b981" }}>{routeName}</strong>
                 </button>

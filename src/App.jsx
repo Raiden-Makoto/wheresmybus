@@ -6,6 +6,7 @@ import "./App.css";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import StopPage from "./StopPage.jsx";
 import RouteList from "./RouteList.jsx";
+import RoutePage from "./RoutePage.jsx";
 import { useTheme } from "./ThemeContext.jsx";
 
 // Config
@@ -206,6 +207,9 @@ export default function App() {
       
       {/* Routes page */}
       <Route path="/routes" element={<RouteList />} />
+      
+      {/* Route page */}
+      <Route path="/route/:routeNumber" element={<RoutePage />} />
     </Routes>
   );
 }
