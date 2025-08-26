@@ -33,6 +33,13 @@ export default function RoutePage() {
     }
   };
 
+  const busIcon = L.icon({
+    iconUrl: 'https://www.freeiconspng.com/uploads/red-bus-icon-8.png',
+    iconSize: [28, 28], // Size of the icon
+    iconAnchor: [14, 28],
+    popupAnchor: [0, -28]
+  });
+
   function FitBounds({ vehicles }) {
     const map = useMap();
   
@@ -184,14 +191,7 @@ export default function RoutePage() {
             <Marker 
             key={v.vehicleId}
             position={[v.latitude, v.longitude]}
-            icon={L.divIcon({
-                className: 'custom-marker bus-stop',
-                html: `<svg width="20" height="26" viewBox="0 0 20 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 0C4.48 0 0 4.48 0 10c0 7.5 10 16 10 16s10-8.5 10-16c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" fill="#ef4444"/>
-                </svg>`,
-                iconSize: [20, 26],
-                iconAnchor: [10, 26]
-            })}
+            icon={busIcon}
             >
             <Popup>
                 <b>Vehicle {v.vehicle_id}</b>
