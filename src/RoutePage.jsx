@@ -17,6 +17,7 @@ export default function RoutePage() {
   const [vehicles, setVehicles] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
   
   // Get route name from navigation state
   const routeName = location.state?.routeName || `Route ${routeNumber}`;
@@ -86,7 +87,30 @@ export default function RoutePage() {
   
     return `${hh}:${mm}:${ss}`;
   }
+
+  function FlyToVehicle({ vehicles, selectedVehicle }) {
+    const map = useMap();
   
+    useEffect(() => {
+      if (!selectedVehicle || !vehicles) return;
+  
+      const v = vehicles.find(x => x.vehicle_id === selectedVehicle);
+      if (v) {
+        const latlng = L.latLng(v.latitude, v.longitude);
+        map.flyTo(latlng, 17, { duration: 0.6 });
+  
+        // open popup
+        const layer = Object.values(map._layers).find(
+          l => l.getLatLng && l.getLatLng().equals(latlng)
+        );
+        if (layer) {
+          layer.openPopup();
+        }
+      }
+    }, [selectedVehicle, vehicles, map]);
+  
+    return null;
+  }
 
   function FitBounds({ vehicles }) {
     const map = useMap();
@@ -248,6 +272,7 @@ export default function RoutePage() {
                 </Marker>
             ))}
             <FitBounds vehicles={vehicles} />
+            <FlyToVehicle vehicles={vehicles} selectedVehicle={selectedVehicle} />
             </MapContainer>
         ) : (
             <div style={{ padding: "20px", textAlign: "center" }}>
@@ -264,16 +289,18 @@ export default function RoutePage() {
                     {routeNumber}{v.branch ? v.branch : ""} {v.destination}
                 </div>
                 <div className="vehicle-time">
-                    {v.time} (
-                        {addTimeAndDelay(v.time, v.delay)} |{" "}
-                        <span className={v.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
-                        {v.delay}
-                        </span>
-                    )
+                    <span className={v.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
+                    {v.delay} ({v.delay.startsWith("-") ? "delayed" : "early"})
+                    </span>
                 </div>
                 </div>
                 <div className="vehicle-meta">
-                <button className="vehicle-btn">{v.vehicle_id}</button>
+                <button
+                    className="vehicle-btn"
+                    onClick={() => setSelectedVehicle(v.vehicle_id)}
+                >
+                    {v.vehicle_id}
+                </button>
                 <div className="vehicle-model">{getModel(v.vehicle_id).model}</div>
                 </div>
             </div>
