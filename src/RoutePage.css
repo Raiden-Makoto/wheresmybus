@@ -1,0 +1,63 @@
+/* Vehicle cards layout for RoutePage */
+.vehicle-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-secondary); /* theme-aware background */
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    color: var(--text-primary);
+  }
+  
+  .vehicle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .vehicle-route {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .vehicle-time {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  
+  .vehicle-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* right-align everything */
+    text-align: right;     /* ensure text also aligns right */
+  }
+  
+  .vehicle-btn {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .vehicle-model {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  
+  .delay-positive {
+    color: #16a34a; /* green */
+    font-weight: bold;
+  }
+  
+  .delay-negative {
+    color: #dc2626; /* red */
+    font-weight: bold;
+  }
+  

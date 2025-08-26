@@ -5,6 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { useTheme } from "./ThemeContext.jsx";
 import "./App.css";
+import "./RoutePage.css"
+import models from "../models.json";
 
 export default function RoutePage() {
   const { routeNumber } = useParams();
@@ -39,6 +41,52 @@ export default function RoutePage() {
     iconAnchor: [14, 28],
     popupAnchor: [0, -28]
   });
+
+  function getModel(vehicleId) {
+    const id = Number(vehicleId);
+    for (const range in models) {
+      const [start, end] = range.split("-").map(Number);
+      if (id >= start && id <= end) {
+        return models[range];
+      }
+    }
+    return "Unknown model";
+  }
+
+  function addTimeAndDelay(timeStr, delayStr) {
+    if (!timeStr || !delayStr) return "";
+  
+    // parse timeStr = "HH:MM:SS"
+    const [h, m, s] = timeStr.split(":").map(x => parseInt(x, 10));
+  
+    // handle delayStr = "+MM:SS" or "-MM:SS"
+    const isPositive = delayStr.startsWith("+");
+    const clean = delayStr.replace("+", "").replace("-", "");
+    const [dm, ds] = clean.split(":").map(x => parseInt(x, 10));
+  
+    if ([h, m, s, dm, ds].some(isNaN)) {
+      console.warn("Bad time/delay input:", { timeStr, delayStr });
+      return "";
+    }
+  
+    // total delay in seconds
+    const delaySeconds = dm * 60 + ds;
+  
+    // IMPORTANT: invert meaning
+    // +delay = early → subtract from scheduled
+    // -delay = late  → add to scheduled
+    const signedDelay = isPositive ? -delaySeconds : delaySeconds;
+  
+    let totalSeconds = h * 3600 + m * 60 + s + signedDelay;
+  
+    // normalize into HH:MM:SS
+    const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+    const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+    const ss = String(totalSeconds % 60).padStart(2, "0");
+  
+    return `${hh}:${mm}:${ss}`;
+  }
+  
 
   function FitBounds({ vehicles }) {
     const map = useMap();
@@ -177,36 +225,65 @@ export default function RoutePage() {
         position: "relative"
     }}
     >
-    {vehicles && vehicles.length > 0 ? (
-        <MapContainer 
-        center={[vehicles[0].latitude, vehicles[0].longitude]} 
-        zoom={14} 
-        style={{ height: "100%", width: "100%" }}
-        >
-        <TileLayer 
-            attribution='&copy; OpenStreetMap contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
-        />
-        {vehicles.map((v) => (
-            <Marker 
-            key={v.vehicleId}
-            position={[v.latitude, v.longitude]}
-            icon={busIcon}
+        {vehicles && vehicles.length > 0 ? (
+            <MapContainer 
+            center={[vehicles[0].latitude, vehicles[0].longitude]} 
+            zoom={14} 
+            style={{ height: "100%", width: "100%" }}
             >
-            <Popup>
-                <b>Vehicle {v.vehicle_id}</b>
-                <br/>{v.destination}
-            </Popup>
-            </Marker>
-        ))}
-        <FitBounds vehicles={vehicles} />
-        </MapContainer>
-    ) : (
-        <div style={{ padding: "20px", textAlign: "center" }}>
-        <p>No vehicles currently found for this route.</p>
-        </div>
-    )}
+            <TileLayer 
+                attribution='&copy; OpenStreetMap contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
+            />
+            {vehicles.map((v) => (
+                <Marker 
+                key={v.vehicleId}
+                position={[v.latitude, v.longitude]}
+                icon={busIcon}
+                >
+                <Popup>
+                    <b>Vehicle {v.vehicle_id}</b>
+                    <br/>{v.destination}
+                </Popup>
+                </Marker>
+            ))}
+            <FitBounds vehicles={vehicles} />
+            </MapContainer>
+        ) : (
+            <div style={{ padding: "20px", textAlign: "center" }}>
+            <p>No vehicles currently found for this route.</p>
+            </div>
+        )}
     </div>
+    <div style={{ margin: "0 20px 20px 20px" }}>
+        {vehicles && vehicles.length > 0 ? (
+            vehicles.map((v) => (
+            <div key={v.vehicle_id} className="vehicle-card">
+                <div className="vehicle-info">
+                <div className="vehicle-route">
+                    {routeNumber}{v.branch ? v.branch : ""} {v.destination}
+                </div>
+                <div className="vehicle-time">
+                    {v.time} (
+                        {addTimeAndDelay(v.time, v.delay)} |{" "}
+                        <span className={v.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
+                        {v.delay}
+                        </span>
+                    )
+                </div>
+                </div>
+                <div className="vehicle-meta">
+                <button className="vehicle-btn">{v.vehicle_id}</button>
+                <div className="vehicle-model">{getModel(v.vehicle_id).model}</div>
+                </div>
+            </div>
+            ))
+        ) : (
+            <p style={{ textAlign: "center", marginTop: "10px" }}>
+            No vehicles currently found for this route.
+            </p>
+        )}
+        </div>
     </div>
   );
 }
