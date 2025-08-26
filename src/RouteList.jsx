@@ -91,9 +91,6 @@ export default function RouteList() {
           className="search-input"
         />
         <button className="menu-button">
-          Search for a Stop
-        </button>
-        <button className="menu-button">
           Search by Route
         </button>
         <button className="menu-button" onClick={handleBackToMap}>

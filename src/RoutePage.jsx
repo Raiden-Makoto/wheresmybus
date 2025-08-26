@@ -1,4 +1,5 @@
 // RoutePage.jsx
+import { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "./ThemeContext.jsx";
 import "./App.css";
@@ -8,6 +9,7 @@ export default function RoutePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const [queryInput, setQueryInput] = useState("");
   
   // Get route name from navigation state
   const routeName = location.state?.routeName || `Route ${routeNumber}`;
@@ -20,17 +22,25 @@ export default function RoutePage() {
     navigate("/routes");
   };
 
+  const handleSearchStop = () => {
+    if (queryInput.trim()) {
+      navigate(`/stop/${queryInput.trim()}`);
+    }
+  };
+
   return (
     <div className="app-container">
       {/* Menu bar */}
       <div className="menu-bar">
         <span className="status-text">Viewing Route {routeNumber}</span>
         <input
-          type="text"
-          placeholder="Search..."
-          className="search-input"
+            type="text"
+            placeholder="Search..."
+            value={queryInput}
+            onChange={(e) => setQueryInput(e.target.value)}
+            className="search-input"
         />
-         <button className="menu-button">
+         <button className="menu-button" onClick={handleSearchStop}>
           Search for a Stop
         </button>
         <button className="menu-button" onClick={handleBackToRoutes}>
