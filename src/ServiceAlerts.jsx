@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 export default function ServiceAlerts() {
   const [isVisible, setIsVisible] = useState(false);
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [notificationDismissed, setNotificationDismissed] = useState(false);
+
 
   const toggleAlerts = () => {
     setIsVisible(!isVisible);
@@ -12,41 +17,78 @@ export default function ServiceAlerts() {
     setIsVisible(false);
   };
 
-  // Mock service alerts data - replace with real API data
-  const alerts = [
-    {
-      id: 1,
-      type: "warning",
-      title: "Route 501 Queen - Delays",
-      message: "Service delays of 10-15 minutes due to construction on Queen Street West.",
-      timestamp: "2 hours ago"
-    },
-    {
-      id: 2,
-      type: "info",
-      title: "Route 5 Avenue Road - Detour",
-      message: "Buses are detouring via Dupont Street due to road closure at Avenue Road and Bloor Street.",
-      timestamp: "4 hours ago"
-    },
-    {
-      id: 3,
-      type: "alert",
-      title: "System-wide - Reduced Service",
-      message: "Reduced service frequency on all routes due to staff shortages. Expect longer wait times.",
-      timestamp: "6 hours ago"
-    }
-  ];
+  // Fetch alerts from API
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        console.log('Fetching alerts from:', 'https://42cummer-transseeapi.hf.space/alerts');
+        const response = await fetch('https://42cummer-transseeapi.hf.space/alerts');
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const alertsData = await response.json();
+        console.log('Alerts data received:', alertsData);
+        
+        // Process alerts with type logic
+        const processedAlerts = alertsData.map((alert, index) => {
+          let alertType = 'info'; // default type
+          
+          // If route contains "shuttle bus" use alert
+          if (alert.route && alert.route.toLowerCase().includes('shuttle bus')) {
+            alertType = 'alert';
+          }
+          // If title contains detour use alert
+          else if (alert.title && alert.title.toLowerCase().includes('detour')) {
+            alertType = 'warning';
+          }
+          // else use info
+          
+          return {
+            id: index + 1,
+            type: alertType,
+            title: alert.title || 'No Title',
+            message: alert.title || 'No message available', // title is the message
+            route: alert.route
+          };
+        });
+        
+        setAlerts(processedAlerts);
+        
+        // Show browser confirm dialog if there are alerts and user hasn't dismissed it
+        if (processedAlerts.length > 0 && !notificationDismissed) {
+          const userChoice = window.confirm('There are service advisories affecting your commute. Would you like to view them?');
+          if (userChoice) {
+            setIsVisible(true);
+          }
+          setNotificationDismissed(true);
+        }
+      } catch (err) {
+        console.error('Failed to fetch alerts:', err);
+        setError('Failed to load service alerts');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAlerts();
+  }, []);
 
   return (
     <div className="alerts-dropdown">
-      {/* View Alerts Button */}
-      <button 
-        className="alerts-toggle" 
-        onClick={toggleAlerts}
-        title={isVisible ? "Hide Service Alerts" : "View Service Alerts"}
-      >
-        {isVisible ? "Hide Alerts" : "View Alerts"}
-      </button>
+        {/* View Alerts Button */}
+        <button 
+          className="alerts-toggle" 
+          onClick={toggleAlerts}
+          title={isVisible ? "Hide Service Alerts" : "View Service Alerts"}
+        >
+          {isVisible ? "Hide Alerts" : "View Alerts"}
+        </button>
 
       {/* Dropdown Panel */}
       {isVisible && (
@@ -58,7 +100,11 @@ export default function ServiceAlerts() {
             </button>
           </div>
           <div className="alerts-content">
-            {alerts.length === 0 ? (
+            {loading ? (
+              <p className="no-alerts">Loading alerts...</p>
+            ) : error ? (
+              <p className="no-alerts">{error}</p>
+            ) : alerts.length === 0 ? (
               <p className="no-alerts">No current service alerts</p>
             ) : (
               alerts.map((alert) => (
@@ -69,10 +115,8 @@ export default function ServiceAlerts() {
                       {alert.type === "info" && "ℹ️"}
                       {alert.type === "alert" && "🚨"}
                     </span>
-                    <span className="alert-title">{alert.title}</span>
-                    <span className="alert-timestamp">{alert.timestamp}</span>
+                    <p className="alert-message">{alert.title}</p>
                   </div>
-                  <p className="alert-message">{alert.message}</p>
                 </div>
               ))
             )}
