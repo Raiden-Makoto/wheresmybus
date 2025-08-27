@@ -28,8 +28,21 @@ function FlyTo({ center }) {
 }
 
 export default function App() {
-  const [showModal, setShowModal] = useState(true);
-  const [status, setStatus] = useState("Waiting…");
+  const [showModal, setShowModal] = useState(() => {
+    // Check if user has already made a location choice
+    const locationChoice = localStorage.getItem('locationChoice');
+    return locationChoice === null; // Only show modal if no choice has been made
+  });
+  const [status, setStatus] = useState(() => {
+    // Set initial status based on stored choice
+    const locationChoice = localStorage.getItem('locationChoice');
+    if (locationChoice === 'enabled') {
+      return "Locating…";
+    } else if (locationChoice === 'disabled') {
+      return "Location off — showing default area";
+    }
+    return "Waiting…";
+  });
   const [stops, setStops] = useState(null);
   const [pos, setPos] = useState(null);
   const [radius, setRadius] = useState(DEFAULT_RADIUS);
@@ -59,11 +72,32 @@ export default function App() {
     })();
   }, []);
 
+  // Auto-enable location if user previously chose to enable it
+  useEffect(() => {
+    const locationChoice = localStorage.getItem('locationChoice');
+    if (locationChoice === 'enabled' && "geolocation" in navigator) {
+      setStatus("Locating…");
+      navigator.geolocation.getCurrentPosition(
+        (p) => {
+          setPos({ lat: p.coords.latitude, lng: p.coords.longitude });
+          setStatus("You are here");
+        },
+        () => {
+          setStatus("Permission denied — using default area");
+          setPos(null);
+        },
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+      );
+    }
+  }, []);
+
 
 
   // Modal actions
   const handleEnableLocation = () => {
     setShowModal(false);
+    localStorage.setItem('locationChoice', 'enabled');
+    
     if (!("geolocation" in navigator)) {
       setStatus("Geolocation not supported — using default area");
       setPos(null);
@@ -85,6 +119,7 @@ export default function App() {
 
   const handleNotNow = () => {
     setShowModal(false);
+    localStorage.setItem('locationChoice', 'disabled');
     setStatus("Location off — showing default area");
     setPos(null);
   };
