@@ -320,6 +320,7 @@ export default function RoutePage() {
                     onClick={() => setSelectedVehicle(v.vehicle_id)}
                 >
                     {v.vehicle_id}
+                    {getModel(v.vehicle_id).charging && <span style={{ marginLeft: '4px' }}>⚡</span>}
                 </button>
                 <div className="vehicle-model">{getModel(v.vehicle_id).model}</div>
                 </div>
