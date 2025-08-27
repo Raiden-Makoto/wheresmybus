@@ -6,7 +6,10 @@ export default function ServiceAlerts() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [notificationDismissed, setNotificationDismissed] = useState(false);
+  const [notificationDismissed, setNotificationDismissed] = useState(() => {
+    // Check if notification was already shown in this session
+    return sessionStorage.getItem('alertsNotificationShown') === 'true';
+  });
 
 
   const toggleAlerts = () => {
@@ -66,7 +69,9 @@ export default function ServiceAlerts() {
           if (userChoice) {
             setIsVisible(true);
           }
+          // Mark as dismissed for this session
           setNotificationDismissed(true);
+          sessionStorage.setItem('alertsNotificationShown', 'true');
         }
       } catch (err) {
         console.error('Failed to fetch alerts:', err);
