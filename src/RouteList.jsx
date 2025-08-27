@@ -10,6 +10,7 @@ export default function RouteList() {
   const [routes, setRoutes] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [queryInput, setQueryInput] = useState("");   // search input
 
   const handleBackToMap = () => {
     navigate("/");
@@ -20,14 +21,14 @@ export default function RouteList() {
     const fetchRoutes = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://42cummer-transseeapi.hf.space/routelist');
+        const response = await fetch("https://42cummer-transseeapi.hf.space/routelist");
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
         const data = await response.json();
         setRoutes(data);
       } catch (err) {
-        console.error('Failed to fetch routes:', err);
+        console.error("Failed to fetch routes:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -36,6 +37,13 @@ export default function RouteList() {
 
     fetchRoutes();
   }, []);
+
+  // Apply filtering (numbers only)
+  const filteredRoutes = routes
+    ? Object.entries(routes).filter(([routeNumber]) =>
+        routeNumber.toString().startsWith(queryInput.trim())
+      )
+    : [];
 
   if (loading) {
     return (
@@ -89,10 +97,10 @@ export default function RouteList() {
           type="text"
           placeholder="Search routes..."
           className="search-input"
+          value={queryInput}
+          onChange={(e) => setQueryInput(e.target.value)}
         />
-        <button className="menu-button">
-          Search by Route
-        </button>
+        <button className="menu-button">Search by Route</button>
         <button className="menu-button" onClick={handleBackToMap}>
           Back to Map
         </button>
@@ -103,22 +111,26 @@ export default function RouteList() {
 
       {/* Content area */}
       <div style={{ padding: "20px" }}>
-        {/* Regular Routes (1-199) */}
+        {/* Conventional Routes (1-199) */}
         <div style={{ marginTop: "30px" }}>
-          <h2 style={{ 
-            color: "var(--text-primary)", 
-            borderBottom: "2px solid var(--border-primary)", 
-            paddingBottom: "8px",
-            marginBottom: "20px"
-          }}>
+          <h2
+            style={{
+              color: "var(--text-primary)",
+              borderBottom: "2px solid var(--border-primary)",
+              paddingBottom: "8px",
+              marginBottom: "20px",
+            }}
+          >
             Conventional Routes
           </h2>
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", 
-            gap: "12px"
-          }}>
-            {routes && Object.entries(routes)
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "12px",
+            }}
+          >
+            {filteredRoutes
               .filter(([routeNumber]) => routeNumber >= 1 && routeNumber <= 199)
               .map(([routeNumber, routeName]) => (
                 <button
@@ -133,19 +145,11 @@ export default function RouteList() {
                     cursor: "pointer",
                     textAlign: "left",
                     fontSize: "14px",
-                    transition: "all 0.2s ease"
+                    transition: "all 0.2s ease",
                   }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = "var(--bg-primary)";
-                    e.target.style.borderColor = "var(--border-secondary)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = "var(--bg-secondary)";
-                    e.target.style.borderColor = "var(--border-primary)";
-                  }}
-                  onClick={() => navigate(`/route/${routeNumber}`, { 
-                    state: { routeName: routeName } 
-                  })}
+                  onClick={() =>
+                    navigate(`/route/${routeNumber}`, { state: { routeName } })
+                  }
                 >
                   <strong>{routeName}</strong>
                 </button>
@@ -153,22 +157,26 @@ export default function RouteList() {
           </div>
         </div>
 
-        {/* Special Routes (200-299) */}
+        {/* Seasonal Specials (200-299) */}
         <div style={{ marginTop: "40px" }}>
-          <h2 style={{ 
-            color: "#ec4899", 
-            borderBottom: "2px solid #ec4899", 
-            paddingBottom: "8px",
-            marginBottom: "20px"
-          }}>
+          <h2
+            style={{
+              color: "#ec4899",
+              borderBottom: "2px solid #ec4899",
+              paddingBottom: "8px",
+              marginBottom: "20px",
+            }}
+          >
             Seasonal Specials
           </h2>
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", 
-            gap: "12px"
-          }}>
-            {routes && Object.entries(routes)
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "12px",
+            }}
+          >
+            {filteredRoutes
               .filter(([routeNumber]) => routeNumber >= 200 && routeNumber <= 299)
               .map(([routeNumber, routeName]) => (
                 <button
@@ -183,19 +191,11 @@ export default function RouteList() {
                     cursor: "pointer",
                     textAlign: "left",
                     fontSize: "14px",
-                    transition: "all 0.2s ease"
+                    transition: "all 0.2s ease",
                   }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = "var(--bg-primary)";
-                    e.target.style.borderColor = "var(--border-secondary)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = "var(--bg-secondary)";
-                    e.target.style.borderColor = "var(--border-primary)";
-                  }}
-                  onClick={() => navigate(`/route/${routeNumber}`, { 
-                    state: { routeName: routeName } 
-                  })}
+                  onClick={() =>
+                    navigate(`/route/${routeNumber}`, { state: { routeName } })
+                  }
                 >
                   <strong style={{ color: "#ec4899" }}>{routeName}</strong>
                 </button>
@@ -203,22 +203,26 @@ export default function RouteList() {
           </div>
         </div>
 
-        {/* Night Routes (300-399) */}
+        {/* Blue Night Network (300-399) */}
         <div style={{ marginTop: "40px" }}>
-          <h2 style={{ 
-            color: "#3b82f6", 
-            borderBottom: "2px solid #3b82f6", 
-            paddingBottom: "8px",
-            marginBottom: "20px"
-          }}>
+          <h2
+            style={{
+              color: "#3b82f6",
+              borderBottom: "2px solid #3b82f6",
+              paddingBottom: "8px",
+              marginBottom: "20px",
+            }}
+          >
             Blue Night Network
           </h2>
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", 
-            gap: "12px"
-          }}>
-            {routes && Object.entries(routes)
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "12px",
+            }}
+          >
+            {filteredRoutes
               .filter(([routeNumber]) => routeNumber >= 300 && routeNumber <= 399)
               .map(([routeNumber, routeName]) => (
                 <button
@@ -233,19 +237,11 @@ export default function RouteList() {
                     cursor: "pointer",
                     textAlign: "left",
                     fontSize: "14px",
-                    transition: "all 0.2s ease"
+                    transition: "all 0.2s ease",
                   }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = "var(--bg-primary)";
-                    e.target.style.borderColor = "var(--border-secondary)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = "var(--bg-secondary)";
-                    e.target.style.borderColor = "var(--border-primary)";
-                  }}
-                  onClick={() => navigate(`/route/${routeNumber}`, { 
-                    state: { routeName: routeName } 
-                  })}
+                  onClick={() =>
+                    navigate(`/route/${routeNumber}`, { state: { routeName } })
+                  }
                 >
                   <strong style={{ color: "#3b82f6" }}>{routeName}</strong>
                 </button>
@@ -253,22 +249,26 @@ export default function RouteList() {
           </div>
         </div>
 
-        {/* Express Routes (900-999) */}
+        {/* Express Network (900-999) */}
         <div style={{ marginTop: "40px" }}>
-          <h2 style={{ 
-            color: "#10b981", 
-            borderBottom: "2px solid #10b981", 
-            paddingBottom: "8px",
-            marginBottom: "20px"
-          }}>
+          <h2
+            style={{
+              color: "#10b981",
+              borderBottom: "2px solid #10b981",
+              paddingBottom: "8px",
+              marginBottom: "20px",
+            }}
+          >
             Express Network
           </h2>
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", 
-            gap: "12px"
-          }}>
-            {routes && Object.entries(routes)
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "12px",
+            }}
+          >
+            {filteredRoutes
               .filter(([routeNumber]) => routeNumber >= 900 && routeNumber <= 999)
               .map(([routeNumber, routeName]) => (
                 <button
@@ -283,19 +283,11 @@ export default function RouteList() {
                     cursor: "pointer",
                     textAlign: "left",
                     fontSize: "14px",
-                    transition: "all 0.2s ease"
+                    transition: "all 0.2s ease",
                   }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = "var(--bg-primary)";
-                    e.target.style.borderColor = "var(--border-secondary)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = "var(--bg-secondary)";
-                    e.target.style.borderColor = "var(--border-primary)";
-                  }}
-                  onClick={() => navigate(`/route/${routeNumber}`, { 
-                    state: { routeName: routeName } 
-                  })}
+                  onClick={() =>
+                    navigate(`/route/${routeNumber}`, { state: { routeName } })
+                  }
                 >
                   <strong style={{ color: "#10b981" }}>{routeName}</strong>
                 </button>
