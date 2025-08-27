@@ -9,7 +9,8 @@ export default function RouteList() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [routes, setRoutes] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState(null);
   const [queryInput, setQueryInput] = useState("");   // search input
 
@@ -17,17 +18,43 @@ export default function RouteList() {
     navigate("/");
   };
 
-  // Fetch routes from API
+  // Fetch routes from API or cache
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
-        setLoading(true);
+        // Only show loading on initial fetch
+        if (initialLoading) {
+          setLoading(true);
+        }
+        
+        // Check if routes are cached in localStorage
+        const cachedRoutes = localStorage.getItem('cachedRoutes');
+        const cacheTimestamp = localStorage.getItem('routesCacheTimestamp');
+        const cacheAge = cacheTimestamp ? Date.now() - parseInt(cacheTimestamp) : Infinity;
+        
+        // Use cached routes if they're less than 24 hours old
+        if (cachedRoutes && cacheAge < 24 * 60 * 60 * 1000) {
+          console.log('Using cached routes (age:', Math.round(cacheAge / 1000 / 60), 'minutes)');
+          setRoutes(JSON.parse(cachedRoutes));
+          setInitialLoading(false);
+          setLoading(false);
+          return;
+        }
+        
+        // Fetch fresh routes from API
+        console.log('Fetching fresh routes from API');
         const response = await fetch("https://42cummer-transseeapi.hf.space/routelist");
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
         const data = await response.json();
+        
+        // Cache the routes with timestamp
+        localStorage.setItem('cachedRoutes', JSON.stringify(data));
+        localStorage.setItem('routesCacheTimestamp', Date.now().toString());
+        
         setRoutes(data);
+        setInitialLoading(false); // Mark initial load as complete
       } catch (err) {
         console.error("Failed to fetch routes:", err);
         setError(err.message);
@@ -48,7 +75,7 @@ export default function RouteList() {
       })
     : [];
 
-  if (loading) {
+  if (initialLoading && loading) {
     return (
       <div className="app-container">
         <div className="menu-bar">

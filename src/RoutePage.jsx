@@ -16,7 +16,8 @@ export default function RoutePage() {
   const { theme, toggleTheme } = useTheme();
   const [queryInput, setQueryInput] = useState("");
   const [vehicles, setVehicles] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   
@@ -131,7 +132,10 @@ export default function RoutePage() {
   useEffect(() => {
     const fetchVehicles = async () => {
         try {
-            setLoading(true);
+            // Only show loading on initial fetch
+            if (initialLoading) {
+                setLoading(true);
+            }
             const response = await fetch("https://42cummer-transseeapi.hf.space/listvehiclesbyroute", {
                 method: "POST",
                 headers: {
@@ -146,6 +150,7 @@ export default function RoutePage() {
             }
             const data = await response.json()
             setVehicles(data.vehicles);
+            setInitialLoading(false); // Mark initial load as complete
         } catch (err) {
             console.error('Failed to fetch routes:', err);
             setError(err.message);
@@ -153,10 +158,18 @@ export default function RoutePage() {
             setLoading(false);
         }
     };
+    
+    // Initial fetch
     fetchVehicles();
-  }, []);
+    
+    // Set up interval to fetch vehicles every minute
+    const intervalId = setInterval(fetchVehicles, 60000); // 60000ms = 1 minute
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [routeNumber]);
 
-  if (loading) {
+  if (initialLoading && loading) {
     return (
       <div className="app-container">
         <div className="menu-bar">
@@ -211,7 +224,10 @@ export default function RoutePage() {
     <div className="app-container">
       {/* Menu bar */}
       <div className="menu-bar">
-        <span className="status-text">Viewing Vehicles for {routeName}</span>
+        <span className="status-text">
+          Viewing Vehicles for {routeName}
+          {!initialLoading && loading && <span style={{ marginLeft: '8px', opacity: 0.7 }}>🔄</span>}
+        </span>
         <input
             type="text"
             placeholder="Search..."

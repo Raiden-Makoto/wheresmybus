@@ -81,8 +81,15 @@ export default function ServiceAlerts() {
       }
     };
 
+    // Initial fetch
     fetchAlerts();
-  }, []);
+    
+    // Set up interval to fetch alerts every minute
+    const intervalId = setInterval(fetchAlerts, 60000); // 60000ms = 1 minute
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [notificationDismissed]);
 
   return (
     <div className="alerts-dropdown">
