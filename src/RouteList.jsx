@@ -39,11 +39,13 @@ export default function RouteList() {
     fetchRoutes();
   }, []);
 
-  // Apply filtering (numbers only)
+  // Apply filtering (contains search)
   const filteredRoutes = routes
-    ? Object.entries(routes).filter(([routeNumber]) =>
-        routeNumber.toString().startsWith(queryInput.trim())
-      )
+    ? Object.entries(routes).filter(([routeNumber, routeName]) => {
+        const searchTerm = queryInput.trim().toLowerCase();
+        return routeNumber.toString().toLowerCase().includes(searchTerm) ||
+               routeName.toLowerCase().includes(searchTerm);
+      })
     : [];
 
   if (loading) {
