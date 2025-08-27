@@ -8,6 +8,7 @@ import StopPage from "./StopPage.jsx";
 import RouteList from "./RouteList.jsx";
 import RoutePage from "./RoutePage.jsx";
 import { useTheme } from "./ThemeContext.jsx";
+import ServiceAlerts from "./ServiceAlerts.jsx";
 
 // Config
 const DATA_URL = "https://api.npoint.io/96cc873ccf014e5cbd0c";
@@ -153,6 +154,7 @@ export default function App() {
               <button className="menu-button" onClick={() => navigate('/routes')}>
                 Search by Route
               </button>
+              <ServiceAlerts />
               <button className="theme-toggle" onClick={toggleTheme}>
                 {theme === "light" ? "🌙" : "☀️"}
               </button>

@@ -5,6 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { useTheme } from "./ThemeContext.jsx";
+import ServiceAlerts from "./ServiceAlerts.jsx";
 
 export default function StopPage({ stops }) {
   const { stopCode } = useParams(); // get code from /stop/:stopCode
@@ -55,6 +56,7 @@ export default function StopPage({ stops }) {
         <button className="menu-button" onClick={handleBackToMap}>
           Back to Map
         </button>
+        <ServiceAlerts />
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "light" ? "🌙" : "☀️"}
         </button>

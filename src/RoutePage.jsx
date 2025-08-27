@@ -7,6 +7,7 @@ import { useTheme } from "./ThemeContext.jsx";
 import "./App.css";
 import "./RoutePage.css"
 import models from "../models.json";
+import ServiceAlerts from "./ServiceAlerts.jsx";
 
 export default function RoutePage() {
   const { routeNumber } = useParams();
@@ -166,6 +167,7 @@ export default function RoutePage() {
           <button className="menu-button" onClick={handleBackToRoutes}>
             Back to All Routes
           </button>
+          <ServiceAlerts />
           <button className="theme-toggle" onClick={toggleTheme}>
             {theme === "light" ? "🌙" : "☀️"}
           </button>
@@ -189,6 +191,7 @@ export default function RoutePage() {
           <button className="menu-button" onClick={handleBackToMap}>
             Back to Map
           </button>
+          <ServiceAlerts />
           <button className="theme-toggle" onClick={toggleTheme}>
             {theme === "light" ? "🌙" : "☀️"}
           </button>
@@ -225,6 +228,7 @@ export default function RoutePage() {
         <button className="menu-button" onClick={handleBackToMap}>
           Back to Map
         </button>
+        <ServiceAlerts />
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "light" ? "🌙" : "☀️"}
         </button>

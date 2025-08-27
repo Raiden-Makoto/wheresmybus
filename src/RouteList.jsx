@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "./ThemeContext.jsx";
 import { useState, useEffect } from "react";
 import "./App.css";
+import ServiceAlerts from "./ServiceAlerts.jsx";
 
 export default function RouteList() {
   const navigate = useNavigate();
@@ -73,6 +74,7 @@ export default function RouteList() {
           <button className="menu-button" onClick={handleBackToMap}>
             Back to Map
           </button>
+          <ServiceAlerts />
           <button className="theme-toggle" onClick={toggleTheme}>
             {theme === "light" ? "🌙" : "☀️"}
           </button>
@@ -104,6 +106,7 @@ export default function RouteList() {
         <button className="menu-button" onClick={handleBackToMap}>
           Back to Map
         </button>
+        <ServiceAlerts />
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "light" ? "🌙" : "☀️"}
         </button>
