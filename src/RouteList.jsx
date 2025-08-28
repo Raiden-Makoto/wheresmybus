@@ -170,7 +170,7 @@ export default function RouteList() {
               marginBottom: "20px",
             }}
           >
-            Conventional Routes
+            Regular Routes
           </h2>
           <div
             style={{
