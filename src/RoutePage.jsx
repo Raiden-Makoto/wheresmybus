@@ -225,7 +225,7 @@ export default function RoutePage() {
       {/* Menu bar */}
       <div className="menu-bar">
         <span className="status-text">
-          Viewing Vehicles for {routeName}
+          Found {vehicles?.length || 0} Vehicles
           {!initialLoading && loading && <span style={{ marginLeft: '8px', opacity: 0.7 }}>🔄</span>}
         </span>
         <input
