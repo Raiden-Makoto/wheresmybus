@@ -17,6 +17,7 @@ export default function StopPage({ stops }) {
   
   const [stopData, setStopData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [selectedRoutes, setSelectedRoutes] = useState(new Set());
@@ -94,7 +95,10 @@ export default function StopPage({ stops }) {
   useEffect(() => {
     const fetchStopData = async () => {
       try {
-        setLoading(true);
+        // Only show loading on initial fetch, not on background refreshes
+        if (initialLoading) {
+          setLoading(true);
+        }
         const response = await fetch(`https://42cummer-transseeapi.hf.space/seek`, {
           method: 'POST',
           headers: {
@@ -113,6 +117,7 @@ export default function StopPage({ stops }) {
         console.error('Error fetching stop data:', err);
       } finally {
         setLoading(false);
+        setInitialLoading(false);
       }
     };
 
@@ -276,7 +281,7 @@ export default function StopPage({ stops }) {
       {/* Vehicle Cards */}
       <div style={{ margin: "0 20px 20px 20px" }}>
         <h2>Upcoming Departures</h2>
-        {loading ? (
+        {initialLoading && loading ? (
           <div style={{ textAlign: "center", padding: "20px" }}>
             <p>Loading stop information...</p>
           </div>
