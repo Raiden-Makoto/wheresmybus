@@ -6,16 +6,72 @@ import "leaflet/dist/leaflet.css";
 import "./App.css";
 import { useTheme } from "./ThemeContext.jsx";
 import ServiceAlerts from "./ServiceAlerts.jsx";
+import { useState, useEffect } from "react";
+import models from "../models.json";
 
 export default function StopPage({ stops }) {
   const { stopCode } = useParams(); // get code from /stop/:stopCode
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const stop = stops?.[stopCode];   // look up in stops data
+  
+  const [stopData, setStopData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
 
   const handleBackToMap = () => {
     navigate("/");
   };
+
+  const handleSearchStop = () => {
+    const trimmedSearch = searchInput.trim();
+    if (trimmedSearch) {
+      navigate(`/stop/${trimmedSearch}`);
+    }
+  };
+
+  function getModel(vehicleId) {
+    const id = Number(vehicleId);
+    for (const range in models) {
+      const [start, end] = range.split("-").map(Number);
+      if (id >= start && id <= end) {
+        return models[range];
+      }
+    }
+    return "Unknown model";
+  }
+
+  // Fetch stop data from /seek endpoint
+  useEffect(() => {
+    const fetchStopData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`https://42cummer-transseeapi.hf.space/seek`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ stop: stopCode })
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch stop data');
+        }
+        const data = await response.json();
+        setStopData(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching stop data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (stopCode) {
+      fetchStopData();
+    }
+  }, [stopCode]);
 
   if (!stop) {
     return (
@@ -46,8 +102,11 @@ export default function StopPage({ stops }) {
           type="text"
           placeholder="Search..."
           className="search-input"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSearchStop()}
         />
-        <button className="menu-button">
+        <button className="menu-button" onClick={handleSearchStop}>
           Search for a Stop
         </button>
         <button className="menu-button" onClick={() => navigate('/routes')}>
@@ -105,9 +164,45 @@ export default function StopPage({ stops }) {
         </MapContainer>
       </div>
 
-      {/* Route Info */}
-      <div style={{ padding: "00px 20px 20px 20px" }}>
+      {/* Vehicle Cards */}
+      <div style={{ margin: "0 20px 20px 20px" }}>
         <h2>Upcoming Departures</h2>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <p>Loading stop information...</p>
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <p>Error: {error}</p>
+          </div>
+        ) : stopData && stopData.vehicles && stopData.vehicles.length > 0 ? (
+          stopData.vehicles.map((vehicle, index) => (
+            <div key={`${vehicle.route}-${vehicle.vehicle_number}-${index}`} className="vehicle-card">
+              <div className="vehicle-info">
+                <div className="vehicle-route">
+                  {vehicle.route}{vehicle.branch ? vehicle.branch : ""} {vehicle.destination}
+                </div>
+                <div className="vehicle-time">
+                  {vehicle.scheduled} (<span className={vehicle.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
+                    {vehicle.delay}
+                  </span> | {vehicle.actual})
+                </div>
+              </div>
+              <div className="vehicle-meta">
+                <div className="vehicle-btn">
+                  {vehicle.vehicle_number}
+                </div>
+                <div className="vehicle-model">
+                  {getModel(vehicle.vehicle_number).model}
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p style={{ textAlign: "center", marginTop: "10px" }}>
+            No upcoming departures found for this stop.
+          </p>
+        )}
       </div>
     </div>
   );

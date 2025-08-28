@@ -132,6 +132,25 @@
   background: #1d4ed8;
 }
 
+/* Route button hover effects */
+.route-button:hover {
+  background: var(--bg-primary) !important;
+  border-color: var(--border-secondary) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-primary), 0 2px 4px var(--shadow-secondary);
+}
+
+/* Delay styling for vehicle times */
+.delay-positive {
+  color: #16a34a; /* green */
+  font-weight: bold;
+}
+
+.delay-negative {
+  color: #dc2626; /* red */
+  font-weight: bold;
+}
+
 /* Menu bar styles */
 .menu-bar {
   position: sticky;
