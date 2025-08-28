@@ -19,6 +19,7 @@ export default function StopPage({ stops }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchInput, setSearchInput] = useState("");
+  const [selectedRoutes, setSelectedRoutes] = useState(new Set());
 
   const handleBackToMap = () => {
     navigate("/");
@@ -213,6 +214,57 @@ export default function StopPage({ stops }) {
         </MapContainer>
       </div>
 
+      {/* Route Filter Checkboxes */}
+      {stopData && stopData.routes && stopData.routes.length > 0 && (
+        <div style={{ margin: "0 20px 20px 20px" }}>
+          <h3 style={{ marginBottom: "12px", fontSize: "16px", color: "var(--text-secondary)" }}>
+            Filter by Route:
+          </h3>
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: "12px", 
+            marginBottom: "20px"
+          }}>
+            {stopData.routes.map((route) => (
+              <div key={route.name} style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "8px",
+                padding: "12px 16px",
+                background: "var(--bg-secondary)",
+                borderRadius: "8px",
+                border: "1px solid var(--border-primary)",
+                cursor: "pointer"
+              }}>
+                <input
+                  type="checkbox"
+                  checked={selectedRoutes.has(route.name)}
+                  onChange={(e) => {
+                    const newSelected = new Set(selectedRoutes);
+                    if (e.target.checked) {
+                      newSelected.add(route.name);
+                    } else {
+                      newSelected.delete(route.name);
+                    }
+                    setSelectedRoutes(newSelected);
+                  }}
+                  style={{ cursor: "pointer" }}
+                />
+                <span style={{ 
+                  fontSize: "14px", 
+                  color: route.name.match(/^\d+/)?.[0] >= 200 && route.name.match(/^\d+/)?.[0] <= 299 ? '#ec4899' : 
+                         route.name.match(/^\d+/)?.[0] >= 300 && route.name.match(/^\d+/)?.[0] <= 399 ? '#3b82f6' : 
+                         route.name.match(/^\d+/)?.[0] >= 900 && route.name.match(/^\d+/)?.[0] <= 999 ? '#10b981' : 'var(--text-primary)'
+                }}>
+                  {route.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Vehicle Cards */}
       <div style={{ margin: "0 20px 20px 20px" }}>
         <h2>Upcoming Departures</h2>
@@ -225,7 +277,16 @@ export default function StopPage({ stops }) {
             <p>Error: {error}</p>
           </div>
         ) : stopData && stopData.vehicles && stopData.vehicles.length > 0 ? (
-          stopData.vehicles.map((vehicle, index) => (
+          stopData.vehicles
+            .filter(vehicle => {
+              // If no routes are selected, show all vehicles
+              if (selectedRoutes.size === 0) return true;
+              // Otherwise, only show vehicles whose route matches a selected route
+              return stopData.routes?.some(route => 
+                route.name.startsWith(vehicle.route) && selectedRoutes.has(route.name)
+              );
+            })
+            .map((vehicle, index) => (
             <div key={`${vehicle.route}-${vehicle.vehicle_number}-${index}`} className="vehicle-card">
               <div className="vehicle-info">
                 <div className="vehicle-route">
