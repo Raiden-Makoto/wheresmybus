@@ -1,6 +1,6 @@
 // StopPage.jsx
 import { useParams, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
@@ -40,6 +40,53 @@ export default function StopPage({ stops }) {
       }
     }
     return "Unknown model";
+  }
+
+  // Component to update map center when stop changes
+  function UpdateMapCenter({ center }) {
+    const map = useMap();
+    
+    useEffect(() => {
+      if (center && center[0] && center[1]) {
+        map.setView(center, 16);
+      }
+    }, [center, map]);
+    
+    return null;
+  }
+
+  function addTimeAndDelay(timeStr, delayStr) {
+    if (!timeStr || !delayStr) return "";
+  
+    // parse timeStr = "HH:MM:SS"
+    const [h, m, s] = timeStr.split(":").map(x => parseInt(x, 10));
+  
+    // handle delayStr = "+MM:SS" or "-MM:SS"
+    const isPositive = delayStr.startsWith("+");
+    const clean = delayStr.replace("+", "").replace("-", "");
+    const [dm, ds] = clean.split(":").map(x => parseInt(x, 10));
+  
+    if ([h, m, s, dm, ds].some(isNaN)) {
+      console.warn("Bad time/delay input:", { timeStr, delayStr });
+      return "";
+    }
+  
+    // total delay in seconds
+    const delaySeconds = dm * 60 + ds;
+  
+    // IMPORTANT: invert meaning
+    // +delay = early → add to scheduled (bus arrives early)
+    // -delay = late  → subtract from scheduled (bus arrives late)
+    const signedDelay = isPositive ? delaySeconds : -delaySeconds;
+  
+    let totalSeconds = h * 3600 + m * 60 + s + signedDelay;
+  
+    // normalize into HH:MM:SS
+    const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, 0);
+    const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, 0);
+    const ss = String(totalSeconds % 60).padStart(2, 0);
+  
+    return `${hh}:${mm}:${ss}`;
   }
 
   // Fetch stop data from /seek endpoint
@@ -110,7 +157,7 @@ export default function StopPage({ stops }) {
           Search for a Stop
         </button>
         <button className="menu-button" onClick={() => navigate('/routes')}>
-          Search by Route
+          View All Routes
         </button>
         <button className="menu-button" onClick={handleBackToMap}>
           Back to Map
@@ -136,11 +183,13 @@ export default function StopPage({ stops }) {
         position: "relative"
       }}>
         <MapContainer 
+          key={stopCode} // Force re-render when stop changes
           center={[stopLat, stopLon]} 
           zoom={16} 
           style={{ height: "100%", width: "100%" }}
           scrollWheelZoom={false}
         >
+          <UpdateMapCenter center={[stopLat, stopLon]} />
           <TileLayer 
             attribution='&copy; OpenStreetMap contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
@@ -183,14 +232,15 @@ export default function StopPage({ stops }) {
                   {vehicle.route}{vehicle.branch ? vehicle.branch : ""} {vehicle.destination}
                 </div>
                 <div className="vehicle-time">
-                  {vehicle.scheduled} (<span className={vehicle.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
+                  At {vehicle.actual} (<span className={vehicle.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
                     {vehicle.delay}
-                  </span> | {vehicle.actual})
+                  </span> | {addTimeAndDelay(vehicle.actual, vehicle.delay)})
                 </div>
               </div>
               <div className="vehicle-meta">
                 <div className="vehicle-btn">
                   {vehicle.vehicle_number}
+                  {getModel(vehicle.vehicle_number).charging && <span style={{ marginLeft: '4px' }}>⚡</span>}
                 </div>
                 <div className="vehicle-model">
                   {getModel(vehicle.vehicle_number).model}
