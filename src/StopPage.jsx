@@ -229,7 +229,7 @@ export default function StopPage({ stops }) {
             <div key={`${vehicle.route}-${vehicle.vehicle_number}-${index}`} className="vehicle-card">
               <div className="vehicle-info">
                 <div className="vehicle-route">
-                  {vehicle.route}{vehicle.branch ? vehicle.branch : ""} {vehicle.destination}
+                  {stopData.routes?.find(r => r.name.startsWith(vehicle.route))?.name || vehicle.route}
                 </div>
                 <div className="vehicle-time">
                   At {vehicle.actual} (<span className={vehicle.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
