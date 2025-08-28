@@ -298,7 +298,17 @@ export default function StopPage({ stops }) {
             <div key={`${vehicle.route}-${vehicle.vehicle_number}-${index}`} className="vehicle-card">
               <div className="vehicle-info">
                 <div className="vehicle-route">
-                  {stopData.routes?.find(r => r.name.startsWith(vehicle.route))?.name || vehicle.route}
+                  {(() => {
+                    const routeInfo = stopData.routes?.find(r => r.name.startsWith(vehicle.route));
+                    if (routeInfo) {
+                      // Split by first space: "927 Highway 27 Express" -> ["927", "Highway 27 Express"]
+                      const [routeNumber, ...routeNameParts] = routeInfo.name.split(' ');
+                      const routeName = routeNameParts.join(' ');
+                      const branch = vehicle.direction || '';
+                      return `${routeNumber}${branch} ${routeName}`;
+                    }
+                    return vehicle.route;
+                  })()} {vehicle.destination}
                 </div>
                 <div className="vehicle-time">
                   At {vehicle.actual} (<span className={vehicle.delay.startsWith("-") ? "delay-negative" : "delay-positive"}>
