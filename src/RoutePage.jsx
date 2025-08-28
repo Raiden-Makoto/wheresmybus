@@ -122,7 +122,7 @@ export default function RoutePage() {
         const bounds = L.latLngBounds(
           vehicles.map(v => [v.latitude, v.longitude])
         );
-        map.fitBounds(bounds, { padding: [10, 10] });
+        map.fitBounds(bounds, { padding: [15, 15] });
       }
     }, [vehicles, map]);
   
