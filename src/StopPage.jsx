@@ -215,7 +215,7 @@ export default function StopPage({ stops }) {
       </div>
 
       {/* Route Filter Checkboxes */}
-      {stopData && stopData.routes && stopData.routes.length > 0 && (
+      {!loading && stopData && stopData.routes && stopData.routes.length > 0 && (
         <div style={{ margin: "0 20px 20px 20px" }}>
           <h3 style={{ marginBottom: "12px", fontSize: "16px", color: "var(--text-secondary)" }}>
             Filter by Route:
