@@ -136,6 +136,23 @@ export default function RouteList() {
           Back to Map
         </button>
         <ServiceAlerts />
+        {/* <button 
+          className="menu-button" 
+          onClick={() => {
+            // Clear cached routes and force refresh
+            localStorage.removeItem('cachedRoutes');
+            localStorage.removeItem('routesCacheTimestamp');
+            window.location.reload();
+          }}
+          style={{ 
+            background: '#dc2626', 
+            borderColor: '#dc2626',
+            fontSize: '11px',
+            padding: '6px 8px'
+          }}
+        >
+          🔄 Debug Refresh
+        </button> */}
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "light" ? "🌙" : "☀️"}
         </button>
@@ -276,6 +293,54 @@ export default function RouteList() {
                   }
                 >
                   <strong style={{ color: "#3b82f6" }}>{routeName}</strong>
+                </button>
+              ))}
+          </div>
+        </div>
+
+        {/* Streetcar (500-599) */}
+        <div style={{ marginTop: "40px" }}>
+          <h2
+            style={{
+              color: "#f59e0b",
+              borderBottom: "2px solid #f59e0b",
+              paddingBottom: "8px",
+              marginBottom: "20px",
+            }}
+          >
+            Streetcar
+          </h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: "12px",
+            }}
+          >
+            {filteredRoutes
+              .filter(([routeNumber]) => routeNumber >= 500 && routeNumber <= 599)
+              .map(([routeNumber, routeName]) => (
+                <button
+                  key={routeNumber}
+                  className="route-button"
+                  style={{
+                    padding: "12px 16px",
+                    border: "1px solid var(--border-primary)",
+                    borderRadius: "8px",
+                    background: "var(--bg-secondary)",
+                    color: "var(--text-primary)",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    fontSize: "14px",
+                    transition: "all 0.2s ease",
+                  }}
+                  onClick={() =>
+                    navigate(`/route/${routeNumber}`, { state: { routeName } })
+                  }
+                >
+                  <strong style={{ color: "#f59e0b" }}>
+                    {routeNumber >= 500 && routeNumber <= 599 ? routeName.slice(0, -1) : routeName}
+                  </strong>
                 </button>
               ))}
           </div>

@@ -117,7 +117,14 @@ export default function StopPage({ stops }) {
     };
 
     if (stopCode) {
+      // Initial fetch
       fetchStopData();
+      
+      // Set up interval to refresh every minute
+      const interval = setInterval(fetchStopData, 60000);
+      
+      // Cleanup interval on unmount or stopCode change
+      return () => clearInterval(interval);
     }
   }, [stopCode]);
 
@@ -255,6 +262,7 @@ export default function StopPage({ stops }) {
                   fontSize: "14px", 
                   color: route.name.match(/^\d+/)?.[0] >= 200 && route.name.match(/^\d+/)?.[0] <= 299 ? '#ec4899' : 
                          route.name.match(/^\d+/)?.[0] >= 300 && route.name.match(/^\d+/)?.[0] <= 399 ? '#3b82f6' : 
+                         route.name.match(/^\d+/)?.[0] >= 500 && route.name.match(/^\d+/)?.[0] <= 599 ? '#f59e0b' :
                          route.name.match(/^\d+/)?.[0] >= 900 && route.name.match(/^\d+/)?.[0] <= 999 ? '#10b981' : 'var(--text-primary)'
                 }}>
                   {route.name}

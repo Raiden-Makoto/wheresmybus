@@ -255,9 +255,11 @@ export default function RoutePage() {
         <h1 style={{ 
           color: routeNumber >= 200 && routeNumber <= 299 ? '#ec4899' : 
                  routeNumber >= 300 && routeNumber <= 399 ? '#3b82f6' : 
+                 routeNumber >= 500 && routeNumber <= 599 ? '#f59e0b' :
                  routeNumber >= 900 && routeNumber <= 999 ? '#10b981' : 'inherit' 
         }}>
-          {routeName}
+          {routeNumber >= 500 && routeNumber <= 599 ? routeName.slice(0, -1) : routeName}
+
         </h1>
       </div>
       <div style={{ 
@@ -321,6 +323,7 @@ export default function RoutePage() {
                 >
                     {v.vehicle_id}
                     {getModel(v.vehicle_id).charging && <span style={{ marginLeft: '4px' }}>⚡</span>}
+                    {routeNumber >= 500 && routeNumber <= 599 && getModel(v.vehicle_id).streetcar && <span style={{ marginLeft: '4px' }}>🚋</span>}
                 </button>
                 <div className="vehicle-model">{getModel(v.vehicle_id).model}</div>
                 </div>
