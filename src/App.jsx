@@ -228,7 +228,18 @@ export default function App() {
                   })}
                 >
                   <Popup>
-                    <b>{s.stopCode}</b>
+                    <b>
+                      <span 
+                        style={{ 
+                          cursor: 'pointer', 
+                          color: 'var(--button-primary)',
+                          textDecoration: 'underline'
+                        }}
+                        onClick={() => navigate(`/stop/${s.stopCode}`)}
+                      >
+                        {s.stopCode}
+                      </span>
+                    </b>
                     <br />{s.name}
                     <br /><small>{s.dist} m away</small>
                   </Popup>
