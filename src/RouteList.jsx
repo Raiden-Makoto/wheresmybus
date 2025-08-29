@@ -18,7 +18,7 @@ export default function RouteList() {
     navigate("/");
   };
 
-  // Fetch routes from API or cache
+  // Fetch routes from API or cache - only once, then keep forever
   useEffect(() => {
     const fetchRoutes = async () => {
       try {
@@ -29,29 +29,26 @@ export default function RouteList() {
         
         // Check if routes are cached in localStorage
         const cachedRoutes = localStorage.getItem('cachedRoutes');
-        const cacheTimestamp = localStorage.getItem('routesCacheTimestamp');
-        const cacheAge = cacheTimestamp ? Date.now() - parseInt(cacheTimestamp) : Infinity;
         
-        // Use cached routes if they're less than 24 hours old
-        if (cachedRoutes && cacheAge < 24 * 60 * 60 * 1000) {
-          console.log('Using cached routes (age:', Math.round(cacheAge / 1000 / 60), 'minutes)');
+        // If we have cached routes, use them immediately (no expiry check)
+        if (cachedRoutes) {
+          console.log('Using cached routes');
           setRoutes(JSON.parse(cachedRoutes));
           setInitialLoading(false);
           setLoading(false);
           return;
         }
         
-        // Fetch fresh routes from API
-        console.log('Fetching fresh routes from API');
+        // Only fetch from API if we don't have cached routes
+        console.log('Fetching fresh routes from API (first time only)');
         const response = await fetch("https://42cummer-transseeapi.hf.space/routelist");
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
         const data = await response.json();
         
-        // Cache the routes with timestamp
+        // Cache the routes permanently (no timestamp needed)
         localStorage.setItem('cachedRoutes', JSON.stringify(data));
-        localStorage.setItem('routesCacheTimestamp', Date.now().toString());
         
         setRoutes(data);
         setInitialLoading(false); // Mark initial load as complete
@@ -67,6 +64,7 @@ export default function RouteList() {
   }, []);
 
   // Apply filtering (contains search)
+  // Routes are now permanently cached - no more API calls after first load
   const filteredRoutes = routes
     ? Object.entries(routes).filter(([routeNumber, routeName]) => {
         const searchTerm = queryInput.trim().toLowerCase();
@@ -136,12 +134,11 @@ export default function RouteList() {
           Back to Map
         </button>
         <ServiceAlerts />
-        {/* <button 
+        <button 
           className="menu-button" 
           onClick={() => {
             // Clear cached routes and force refresh
             localStorage.removeItem('cachedRoutes');
-            localStorage.removeItem('routesCacheTimestamp');
             window.location.reload();
           }}
           style={{ 
@@ -151,8 +148,8 @@ export default function RouteList() {
             padding: '6px 8px'
           }}
         >
-          🔄 Debug Refresh
-        </button> */}
+          🔄 Force Reload
+        </button>
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "light" ? "🌙" : "☀️"}
         </button>
